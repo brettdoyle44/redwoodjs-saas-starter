@@ -1,18 +1,61 @@
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider             = "mysql"
+  url                  = env("DATABASE_URL")
+  referentialIntegrity = "prisma"
 }
 
 generator client {
-  provider      = "prisma-client-js"
-  binaryTargets = "native"
+  provider        = "prisma-client-js"
+  previewFeatures = ["referentialIntegrity"]
 }
 
-// Define your own datamodels here and run `yarn redwood prisma migrate dev`
-// to create migrations for them and apply to your dev DB.
-// TODO: Please remove the following example:
-model UserExample {
-  id    Int     @id @default(autoincrement())
-  email String  @unique
-  name  String?
+// Team Model
+
+model Team {
+  id            String             @id @default(cuid())
+  name          String
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+  memberships   Membership[]
+}
+
+// User Model
+
+model User {
+  id                  String        @id @unique
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+  name                String?
+  email               String?       @unique
+  image               String?
+  memberships         Membership[]
+}
+
+// Membership Model
+
+model Membership {
+  id              String           @id @default(cuid())
+  // Reference to Team is required
+  team            Team             @relation(fields: [teamId], references: [id])
+  teamId          String
+  // Reference to User not required due to invites
+  user            User?             @relation(fields: [userId], references: [id])
+  userId          String?
+
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @default(now())
+  // This gets cleared once invited user has signed up
+  invitedName     String?
+  invitedEmail    String?
+  // Designate the user role
+  role            MembershipRole
+  @@unique([userId, teamId])
+}
+
+// Enums
+
+enum MembershipRole {
+  OWNER
+  MEMBER
+  ADMIN
 }
