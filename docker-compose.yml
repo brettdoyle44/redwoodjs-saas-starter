@@ -3,11 +3,11 @@ services:
   # MySQL
   mysql:
     image: mysql:latest
-    container_name: mysql
+    container_name: saas-starter-mysql
     ports:
       # Accessible from the host at port :35432
       - '3306:3306'
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: example
-      MYSQL_DATABASE: saas
+      MYSQL_DATABASE: saas-starter
