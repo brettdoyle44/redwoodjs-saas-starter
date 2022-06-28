@@ -1,5 +1,6 @@
-import { parseJWT } from '@redwoodjs/api'
 import { AuthenticationError, ForbiddenError } from '@redwoodjs/graphql-server'
+
+import { db } from 'src/lib/db'
 
 /**
  * Represents the user attributes returned by the decoding the
@@ -34,17 +35,48 @@ export const getCurrentUser = async (
   /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
   { event, context }
 ): Promise<RedwoodUser> => {
-  if (!decoded) {
-    return null
+  if (context.currentUser?.userId) {
+    return context.currentUser
   }
 
-  const { roles } = parseJWT({ decoded })
-
-  if (roles) {
-    return { ...decoded, roles }
+  // do we have an accessToken from supabase and an userId from the decoded JWT?
+  if (!token || type != 'supabase' || !decoded?.sub) {
+    return decoded
   }
 
-  return { ...decoded }
+  // find the existing User ...
+  // or create a new User with its userProfile info
+  try {
+    const user = await db.user.findUnique({
+      where: {
+        id: decoded.sub,
+      },
+      include: { memberships: true },
+    })
+
+    if (!user && token) {
+      const userProfile = {
+        id: decoded.sub,
+        name: decoded.user_metadata.full_name,
+        email: decoded.email,
+        image: decoded.user_metadata.avatar_url,
+      }
+
+      const userWithProfile = await db.user.create({
+        data: userProfile,
+      })
+
+      // set the currentUser in context to include its userProfile info
+      const currentUser = context.currentUser
+      context.currentUser = { currentUser, ...userProfile }
+
+      return userWithProfile
+    }
+    return user
+  } catch (error) {
+    console.log(error)
+    return decoded
+  }
 }
 
 /**
