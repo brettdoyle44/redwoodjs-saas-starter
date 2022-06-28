@@ -11,6 +11,7 @@ export const schema = gql`
 
   type Query {
     users: [User!]! @requireAuth
+    user(id: String!): User @requireAuth
   }
 
   input CreateUserInput {
@@ -23,5 +24,9 @@ export const schema = gql`
     name: String
     email: String
     image: String
+  }
+
+  type Mutation {
+    createUser(input: CreateUserInput!): User! @requireAuth
   }
 `

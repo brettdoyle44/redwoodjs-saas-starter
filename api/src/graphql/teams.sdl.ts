@@ -9,6 +9,7 @@ export const schema = gql`
 
   type Query {
     teams: [Team!]! @requireAuth
+    team(id: String!): Team @requireAuth
   }
 
   input CreateTeamInput {
@@ -17,5 +18,9 @@ export const schema = gql`
 
   input UpdateTeamInput {
     name: String
+  }
+
+  type Mutation {
+    createTeam(input: CreateTeamInput!, id: String!): Team! @requireAuth
   }
 `
