@@ -1,0 +1,13 @@
+version: '3'
+services:
+  # MySQL
+  mysql:
+    image: mysql:latest
+    container_name: mysql
+    ports:
+      # Accessible from the host at port :35432
+      - '3306:3306'
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+      MYSQL_DATABASE: saas
