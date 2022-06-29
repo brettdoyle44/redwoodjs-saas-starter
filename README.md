@@ -30,6 +30,8 @@ Create a .env file with proper fields. I supplied examples in .env.example that 
 3. Create a project within that organization
 4. Once the project is created (takes a few minutes) grab the project URL, Project Public API Key, and JWT Secret and place them into your .env file next to the corresponding field. If you can't find these in Supabase go to Settings >> API.
 
+Email signup will work out of the box. If you want to utilize the Google Auth portion of the signup page please see the Supabase documentation for setting that up [https://supabase.com/docs/guides/auth/auth-google](https://supabase.com/docs/guides/auth/auth-google).
+
 **Docker Setup**
 
 Download Docker Desktop. The current version of this app uses a local Mysql DB via Docker.
